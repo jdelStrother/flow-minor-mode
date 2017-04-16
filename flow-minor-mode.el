@@ -138,6 +138,17 @@ BODY progn"
     (compilation-mode)
     (setf buffer-read-only t)))
 
+(defun flow-minor-colorize-type (text)
+  ;; if web-mode is installed, use that to syntax highlight the type information
+  (if (require 'web-mode nil 'noerror)
+      (with-temp-buffer
+        (web-mode)
+        (insert text)
+        (web-mode-set-content-type "jsx")
+        (buffer-string))
+    ;; otherwise, just return the plain text
+    text))
+
 (defun flow-minor-type-at-pos ()
   "Show type at position."
   (interactive)
@@ -146,7 +157,7 @@ BODY progn"
           (line (number-to-string (line-number-at-pos)))
           (col (number-to-string (1+ (current-column))))
           (type (flow-minor-cmd-to-string "type-at-pos" file line col)))
-     (message "%s" (car (split-string type "\n"))))))
+     (message "%s" (flow-minor-colorize-type (car (split-string type "\n")))))))
 
 (defun flow-minor-jump-to-definition ()
   "Jump to definition."
