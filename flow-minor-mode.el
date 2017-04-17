@@ -149,15 +149,18 @@ BODY progn"
     ;; otherwise, just return the plain text
     text))
 
-(defun flow-minor-type-at-pos ()
-  "Show type at position."
-  (interactive)
+(defun flow-minor-get-type-at-pos ()
   (flow-minor-with-flow
    (let* ((file (buffer-file-name))
           (line (number-to-string (line-number-at-pos)))
           (col (number-to-string (1+ (current-column))))
           (type (flow-minor-cmd-to-string "type-at-pos" file line col)))
-     (message "%s" (flow-minor-colorize-type (car (split-string type "\n")))))))
+     (flow-minor-colorize-type (car (split-string type "\n"))))))
+
+(defun flow-minor-type-at-pos ()
+  "Show type at position."
+  (interactive)
+  (message "%s" (flow-minor-get-type-at-pos)))
 
 (defun flow-minor-jump-to-definition ()
   "Jump to definition."
