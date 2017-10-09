@@ -138,16 +138,17 @@ BODY progn"
     (compilation-mode)
     (setf buffer-read-only t)))
 
-(defun flow-minor-colorize-type (text)
-  ;; if web-mode is installed, use that to syntax highlight the type information
+(defun flow-minor-colorize-buffer ()
   (if (require 'web-mode nil 'noerror)
-      (with-temp-buffer
-        (insert text)
-        (setq font-lock-defaults '(web-mode-font-lock-keywords t))
-        (web-mode-set-content-type "jsx")
-        (buffer-string))
-    ;; otherwise, just return the plain text
-    text))
+    (progn
+      (setq font-lock-defaults '(web-mode-font-lock-keywords t))
+      (web-mode-set-content-type "jsx"))))
+
+(defun flow-minor-colorize-type (text)
+  (with-temp-buffer
+    (insert text)
+    (flow-minor-colorize-buffer)
+    (buffer-string)))
 
 (defun flow-minor-type-at-pos ()
   "Show type at position."
@@ -225,6 +226,7 @@ BODY progn"
       (goto-char (point-min))
       (forward-line 1)
       (delete-region (point) (point-max))
+      (flow-minor-colorize-buffer)
       (eldoc-message (car (split-string (buffer-substring (point-min) (point-max)) "\n"))))))
 
 (defun flow-minor-eldoc-documentation-function ()
